@@ -64,8 +64,6 @@ public class SprintPanel extends JPanel {
         dialog.setLayout(new BorderLayout());
         dialog.setSize(450, 400);  // Aumentado para melhor visualização
         SwingUtils.centerWindow(dialog);
-
-        // Painel principal do formulário
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 10, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
