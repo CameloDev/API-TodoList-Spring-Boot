@@ -19,11 +19,15 @@ public class Sprint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
     private String description;
+
+    @Column(name = "start_date")
     private LocalDate startDate;
-    private LocalDate endDate;
+
+    @Column(name = "end_date")
+    private LocalDate  endDate;
+
     private boolean active;
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
