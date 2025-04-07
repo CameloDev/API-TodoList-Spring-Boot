@@ -4,8 +4,12 @@ import db2.todolistapi.model.TaskItem;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class TaskCard extends JPanel {
+    private TaskItem task;
+
     public TaskCard(TaskItem task) {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
@@ -28,5 +32,11 @@ public class TaskCard extends JPanel {
             case CRITICAL -> new Color(255, 200, 200);
         };
         setBackground(bgColor);
+
     }
+
+    public TaskItem getTask() {
+        return task;
+    }
+
 }
