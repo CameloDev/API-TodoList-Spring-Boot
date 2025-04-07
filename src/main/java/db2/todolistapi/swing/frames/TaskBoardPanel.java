@@ -15,6 +15,8 @@ import java.awt.*;
 public class TaskBoardPanel extends JPanel {
     private final TaskService taskService;
     private final SprintService sprintService;
+    private JLabel sprintTitle;
+
 
     private JPanel boardPanel;
     private Sprint currentSprint;
@@ -31,8 +33,7 @@ public class TaskBoardPanel extends JPanel {
         currentSprint = sprintService.getActiveSprint();
 
         JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel sprintTitle = new JLabel(currentSprint != null ?
-                currentSprint.getTitle() : "No active sprint");
+        sprintTitle = new JLabel(currentSprint != null ? currentSprint.getTitle() : "No active sprint");
         sprintTitle.setFont(new Font("Arial", Font.BOLD, 16));
         headerPanel.add(sprintTitle, BorderLayout.CENTER);
 
@@ -55,6 +56,8 @@ public class TaskBoardPanel extends JPanel {
     private void refreshBoard() {
         boardPanel.removeAll();
 
+        sprintTitle.setText(currentSprint != null ? currentSprint.getTitle() : "No active sprint");
+
         if (currentSprint == null) {
             boardPanel.add(new JLabel("No sprint selected", SwingConstants.CENTER));
             return;
@@ -68,6 +71,7 @@ public class TaskBoardPanel extends JPanel {
         revalidate();
         repaint();
     }
+
 
     private JPanel createStatusColumn(TaskStatus status) {
         JPanel column = new JPanel();
