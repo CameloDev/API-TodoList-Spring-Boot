@@ -29,4 +29,11 @@ public class Sprint {
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
     private List<TaskItem> tasks;
 
+    @Override
+    public String toString() {
+        return "Sprint " + id;
+    }
+
+
 }
+
