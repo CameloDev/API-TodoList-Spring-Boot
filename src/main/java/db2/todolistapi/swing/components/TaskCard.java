@@ -38,5 +38,4 @@ public class TaskCard extends JPanel {
     public TaskItem getTask() {
         return task;
     }
-
 }
