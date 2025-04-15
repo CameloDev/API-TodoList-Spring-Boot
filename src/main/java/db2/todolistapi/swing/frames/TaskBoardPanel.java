@@ -15,11 +15,12 @@ import java.awt.*;
 public class TaskBoardPanel extends JPanel {
     private final TaskService taskService;
     private final SprintService sprintService;
+
     private JLabel sprintTitle;
-
-
     private JPanel boardPanel;
+
     private Sprint currentSprint;
+    private JComboBox<Sprint> sprintComboBox;
 
     public TaskBoardPanel(TaskService taskService, SprintService sprintService) {
         this.taskService = taskService;
@@ -37,13 +38,13 @@ public class TaskBoardPanel extends JPanel {
         sprintTitle.setFont(new Font("Arial", Font.BOLD, 16));
         headerPanel.add(sprintTitle, BorderLayout.CENTER);
 
-        JComboBox<Sprint> sprintSelector = new JComboBox<>();
-        sprintService.getAllSprints().forEach(sprintSelector::addItem);
-        sprintSelector.addActionListener(e -> {
-            currentSprint = (Sprint) sprintSelector.getSelectedItem();
+        sprintComboBox = new JComboBox<>();
+        sprintService.getAllSprints().forEach(sprintComboBox::addItem);
+        sprintComboBox.addActionListener(e -> {
+            currentSprint = (Sprint) sprintComboBox.getSelectedItem();
             refreshBoard();
         });
-        headerPanel.add(sprintSelector, BorderLayout.EAST);
+        headerPanel.add(sprintComboBox, BorderLayout.EAST);
 
         add(headerPanel, BorderLayout.NORTH);
 
@@ -70,8 +71,8 @@ public class TaskBoardPanel extends JPanel {
 
         revalidate();
         repaint();
-    }
 
+    }
 
     private JPanel createStatusColumn(TaskStatus status) {
         JPanel column = new JPanel();
@@ -79,7 +80,10 @@ public class TaskBoardPanel extends JPanel {
         column.setBorder(BorderFactory.createTitledBorder(status.toString()));
 
         taskService.getTasksBySprintAndStatus(currentSprint, status).forEach((TaskItem taskItem) -> {
-            TaskCard card = new TaskCard(taskItem);
+            TaskCard card = new TaskCard(taskItem, () -> {
+                taskService.deleteTask(taskItem);
+                refreshData();
+            });
             column.add(card);
             column.add(Box.createVerticalStrut(10));
         });
@@ -117,7 +121,6 @@ public class TaskBoardPanel extends JPanel {
             pointsSpinner.setValue(task.getStoryPoints());
         }
 
-
         formPanel.add(new JLabel("Título*:"));
         formPanel.add(titleField);
         formPanel.add(new JLabel("Descrição:"));
@@ -135,37 +138,35 @@ public class TaskBoardPanel extends JPanel {
 
         saveButton.addActionListener(e -> {
             try {
-
                 if (titleField.getText().trim().isEmpty()) {
                     SwingUtils.showErrorMessage(dialog, "O título da tarefa é obrigatório");
                     return;
                 }
+
                 TaskItem taskToSave = task != null ? task : new TaskItem();
                 taskToSave.setTitle(titleField.getText());
                 taskToSave.setDescription(descArea.getText());
                 taskToSave.setPriority((TaskPriority) priorityCombo.getSelectedItem());
                 taskToSave.setStoryPoints((Integer) pointsSpinner.getValue());
                 taskToSave.setStatus(status);
-
+                Sprint selectedSprint = (Sprint) sprintComboBox.getSelectedItem();
 
                 if (task == null) {
-                    Sprint activeSprint = sprintService.getActiveSprint();
-                    if (activeSprint == null) {
-                        SwingUtils.showErrorMessage(dialog, "Nenhum sprint ativo encontrado");
+                    if (selectedSprint == null) {
+                        SwingUtils.showErrorMessage(dialog, "Selecione uma sprint");
                         return;
                     }
-                    taskToSave.setSprint(activeSprint);
+                    taskToSave.setSprint(selectedSprint);
                 }
-
-
                 taskService.saveTask(taskToSave);
                 refreshData();
+                if (selectedSprint != null) {
+                    sprintComboBox.setSelectedItem(selectedSprint);
+                }
                 dialog.dispose();
-
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SwingUtils.showErrorMessage(dialog,
-                        "Erro ao salvar tarefa: " + ex.getLocalizedMessage());
+                SwingUtils.showErrorMessage(dialog, "Erro ao salvar tarefa: " + ex.getLocalizedMessage());
             }
         });
 
@@ -179,8 +180,23 @@ public class TaskBoardPanel extends JPanel {
 
         dialog.setVisible(true);
     }
+
     public void refreshData() {
-        currentSprint = sprintService.getActiveSprint();
+        Sprint selectedSprint = (Sprint) sprintComboBox.getSelectedItem();
+
+        if (selectedSprint != null) {
+            sprintComboBox.removeAllItems();
+        }
+
+        sprintService.getAllSprints().forEach(sprintComboBox::addItem);
+        if (selectedSprint != null && sprintComboBox.getItemCount() > 0) {
+            sprintComboBox.setSelectedItem(selectedSprint);
+            currentSprint = selectedSprint;
+        } else {
+            sprintTitle.setText("No active sprint");
+            currentSprint = null;
+        }
+        System.out.println(currentSprint+  " e " + selectedSprint);
         refreshBoard();
     }
 }

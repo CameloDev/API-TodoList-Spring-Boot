@@ -33,7 +33,7 @@ public class MainFrame extends JFrame {
 
         tabbedPane = new JTabbedPane();
 
-        sprintPanel = new SprintPanel(sprintService, this::refreshData);
+        sprintPanel = new SprintPanel(sprintService, () -> taskBoardPanel.refreshData());
         taskBoardPanel = new TaskBoardPanel(taskService, sprintService);
         reportsPanel = new ReportsPanel(sprintService, taskService);
 
