@@ -10,7 +10,9 @@ import java.awt.event.MouseEvent;
 public class TaskCard extends JPanel {
     private TaskItem task;
 
-    public TaskCard(TaskItem task) {
+    public TaskCard(TaskItem task, Runnable onDelete) {
+        this.task = task;
+
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
@@ -25,14 +27,31 @@ public class TaskCard extends JPanel {
         add(titleLabel, BorderLayout.NORTH);
         add(infoPanel, BorderLayout.CENTER);
 
-        Color bgColor = switch(task.getPriority()) {
+        JButton deleteButton = new JButton("Excluir");
+        deleteButton.setForeground(Color.RED);
+        deleteButton.setFont(new Font("Arial", Font.PLAIN, 10));
+        deleteButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Tem certeza que deseja excluir a tarefa?",
+                    "Confirmar Exclusão",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                onDelete.run();
+            }
+        });
+
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        footerPanel.add(deleteButton);
+
+        add(footerPanel, BorderLayout.SOUTH);
+
+        Color bgColor = switch (task.getPriority()) {
             case LOW -> new Color(220, 255, 220);
             case MEDIUM -> new Color(255, 255, 200);
             case HIGH -> new Color(255, 220, 220);
             case CRITICAL -> new Color(255, 200, 200);
         };
         setBackground(bgColor);
-
     }
 
     public TaskItem getTask() {
