@@ -57,5 +57,11 @@ public class TaskService {
         return taskRepository.sumStoryPointsBySprintAndStatus(sprint, status);
     }
 
+    public void deleteTask(TaskItem task) {
+        if (task == null || task.getId() == null) {
+            throw new IllegalArgumentException("Tarefa inválida para exclusão");
+        }
 
+        taskRepository.delete(task);
+    }
 }
