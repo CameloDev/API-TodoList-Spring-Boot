@@ -28,7 +28,7 @@ Utiliza **Spring Data JPA**:
 - **TaskRepository**: Gerencia persistência de tarefas.
 
 ### 4. Banco de Dados
-Utiliza banco relacional MySQL
+Utiliza banco relacional 
 - **Tabela `sprint`**: Guarda dados de sprints.
 - **Tabela `task`**: Guarda dados de tarefas com chave estrangeira referenciando `sprint`.
 
